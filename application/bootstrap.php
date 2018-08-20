@@ -157,7 +157,7 @@ Route::set('auth', '(<controller>(/<action>(/<id>)))')
 	'action'     => 'index',
 ));
 
-Route::set('events', 'events/<email_id>')
+Route::set('events', 'events/<email_id>', array('email_id' => '\d+')) 
 ->defaults(array(
 	'controller' => 'events',
 	'action'     => 'index',

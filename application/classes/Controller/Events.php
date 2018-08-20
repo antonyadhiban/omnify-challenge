@@ -9,9 +9,8 @@ class Controller_Events extends Controller {
 
         require_once __DIR__ . '/../../../modules/google-api-php-client/vendor/autoload.php';
 
-        $events = ORM::factory('event');
-
-        $user = ORM::factory('user');
+       
+        $users = ORM::factory('user');
         // try {
         //     //loading model
         //     $myModel = ORM::factory('user')->where('email', '=', $);
@@ -23,16 +22,22 @@ class Controller_Events extends Controller {
         // $parameter = $_GET['code'];
         // $request1 = Request::factory('https://accounts.google.com/o/oauth2/token')->method(Request::POST)->post(array('code' => $parameter, 'client_id' => CLIENT_ID, 'client_secret' => CLIENT_SECRET, 'redirect_uri' => CLIENT_REDIRECT_URL, 'grant_type' => 'authorization_code'));
         // $response1 = $request1->execute();
+        $email_id = $this->request->query('email_id');
 
-        // $request = Request::factory('https://accounts.google.com/o/oauth2/token')->method(Request::POST)->post(array('client_id' => CLIENT_ID, 'client_secret' => CLIENT_SECRET, 'refresh_token' => '1/gSmgjuOFcjvyF7ah46qMw0JK1wj6j-Kt0UzcZLruxdc',  'grant_type' => 'refresh_token'));
+        $users->where('email', '=', $email_id);
+        $current_user = $users->find();
+
+        // $request = Request::factory('https://accounts.google.com/o/oauth2/token')->method(Request::POST)->post(array('client_id' => CLIENT_ID, 'client_secret' => CLIENT_SECRET, 'refresh_token' => $current_user->refresh_token,  'grant_type' => 'refresh_token'));
         // $response = $request->execute();
 
-        $data = json_decode($response, TRUE);
-        $access_token = $data['access_token'];
+        // $data = json_decode($response, TRUE);
+        
+        
+        // $access_token = $data['access_token'];
 
-        $requests = Request::factory('https://www.googleapis.com/calendar/v3/calendars/primary/events/')->headers('Authorization', "Bearer $access_token");
-        $responses = $requests->execute();
-        $ca_data = json_decode($responses, TRUE);
+        // $requests = Request::factory('https://www.googleapis.com/calendar/v3/calendars/primary/events/')->headers('Authorization', "Bearer $access_token");
+        // $responses = $requests->execute();
+        // $ca_data = json_decode($responses, TRUE);
 
         // foreach($ca_data['items'] as &$each_event){
         //     $events = ORM::factory('event');
@@ -40,13 +45,17 @@ class Controller_Events extends Controller {
         //     $events->name = $each_event['summary'];
         //     if(isset($each_event['description']))
         //     $events->description = $each_event['description'];
+        //     $events->email = $email_id;
         //     $events->save();
         // }
-        $events_find_all = ORM::factory('event')->find_all();
-        // $event_count = $events_find_all->count();
-        $view = View::factory('events')->bind('ca_data', $ca_data)->bind('count', $event_count)->bind('events_find_all', $events_find_all);
+        $events = ORM::factory('event');
+        $events->where('email','=',$email_id);
+        $events_find_all= $events->find_all()->as_array();
+        // // $event_count = $events_find_all->count();
+        $view = View::factory('events')->bind('events_find_all', $events_find_all);
         // $view = View::factory('events')->bind('count', $event_count);
     
+
 
         
         // $request_cal = Request::factory('https://www.googleapis.com/calendar/v3/calendars/primary/events/')->headers('Authorization', "Bearer $access_token");
